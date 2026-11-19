@@ -25,6 +25,11 @@ main:focus{outline:none} /* [a11y] יעד "דלג לתוכן" */
 .btn:hover{background:#fff;box-shadow:0 0 0 1px var(--copper)}
 .btn-line{display:inline-block;padding:12px 24px;border:1px solid rgba(243,241,236,.5);font-size:.9375rem;letter-spacing:.03em;transition:background .3s,color .3s}
 .btn-line:hover{background:var(--ink);color:var(--bg)}
+/* כפתור וואטסאפ צף – מימין, באותה שפה של כפתור הנגישות (ריבוע גרפיט, קו נחושת) */
+.wa-fab{position:fixed;right:16px;bottom:16px;z-index:60;width:56px;height:56px;display:grid;place-items:center;background:var(--bg);color:var(--ink);border:1px solid rgba(243,241,236,.35);border-bottom:3px solid var(--copper);box-shadow:0 6px 24px rgba(0,0,0,.28);transition:background .3s,color .3s}
+.wa-fab:hover{background:var(--ink);color:var(--bg)}
+.wa-fab .wa-icon{width:28px;height:28px}
+html[data-contrast="light"] .wa-fab{border-color:rgba(31,35,38,.4);border-bottom-color:var(--copper)}
 .ulink{display:inline-block;border-bottom:1px solid var(--copper);padding-bottom:3px;font-weight:300}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
@@ -115,13 +120,47 @@ h2 b{font-weight:600}
 .row-extra:hover{border-color:var(--on-img)}
 
 /* contact */
-.contact{padding:100px var(--pad) 90px;display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+.contact{padding:100px var(--pad) 48px;display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
 .h-contact{font-size:clamp(2.5rem,calc(4.5vw*var(--fsx)),4rem);line-height:1.05;letter-spacing:-.02em}
 .h-contact b{font-weight:700}
 .contact-links{display:flex;flex-wrap:wrap;align-items:center;gap:28px;margin-top:40px;font-size:1.125rem}
 .bars{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
 .bars span{display:block;height:34px;background:var(--bar)}
 .bars span:nth-child(2){background:var(--copper)}
+
+/* טופס יצירת קשר – קווים אופקיים בלבד, בלי פינות מעוגלות */
+.form-section{padding:0 var(--pad) 64px}
+
+.h-form{font-size:clamp(1.875rem,calc(3vw*var(--fsx)),2.75rem);line-height:1.25;letter-spacing:-.01em;margin-bottom:26px;padding-top:40px;border-top:1px solid rgba(243,241,236,.18)}
+.h-form b{font-weight:600}
+.lead-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 40px}
+.form-note{grid-column:1/-1;margin:0 0 -6px;font-size:.875rem;font-weight:300;color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:8px}
+.field--wide{grid-column:1/-1}
+.field label{font-size:.9375rem;font-weight:400;color:var(--ink)}
+.field .req{font-size:.8125rem;font-weight:300;color:var(--muted)}
+.field input,.field textarea{width:100%;min-height:48px;padding:12px 2px;background:transparent;color:var(--ink);border:0;border-bottom:1px solid rgba(243,241,236,.55);border-radius:0;font:300 1.0625rem 'Noto Sans Hebrew',sans-serif;transition:border-color .3s}
+.field input[dir="ltr"]{text-align:right}
+.field textarea{resize:vertical;min-height:110px;line-height:1.6}
+.field input:hover,.field textarea:hover{border-bottom-color:var(--ink)}
+.field input:focus,.field textarea:focus{border-bottom-color:var(--copper-light)}
+.field input:focus-visible,.field textarea:focus-visible{outline:2px solid var(--copper-light);outline-offset:4px}
+.field [aria-invalid="true"]{border-bottom:2px solid var(--err)}
+.err{margin:0;font-size:.875rem;font-weight:400;color:var(--err)}
+.err::before{content:"! ";font-weight:700}
+.hp{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap} /* לא left:-9999px – ב-RTL זה יוצר גלילה אופקית */
+.form-section{position:relative}
+.form-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:24px}
+.form-actions .btn{border:0;cursor:pointer;font-family:inherit}
+.form-actions .btn:disabled{opacity:.6;cursor:wait}
+.form-status{margin:0;font-size:1rem;font-weight:400}
+.form-status.is-ok{color:var(--ok)}
+.form-status.is-error{color:var(--err)}
+:root{--err:#FFB4A0;--ok:#B6E3B8}
+html[data-contrast="high"]{--err:#FFC4B4;--ok:#C8F0CA}
+html[data-contrast="light"]{--err:#A3321A;--ok:#2E6B32}
+html[data-contrast="light"] .field input,html[data-contrast="light"] .field textarea{border-bottom-color:rgba(31,35,38,.6)}
+html[data-contrast="light"] .h-form{border-top-color:rgba(31,35,38,.2)}
 
 /* footer – [prod] פרטים מלאים במקום "טיוטת עיצוב" */
 .site-footer{padding:28px var(--pad);background:var(--footer);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 32px;font-size:.8125rem;color:var(--dim)}
@@ -158,8 +197,10 @@ h2 b{font-weight:600}
   .row-body{right:22px;width:calc(100% - 44px)}
   .row-more{padding-right:0}
   .row-more p{font-size:1rem}
-  .contact{flex-direction:column;align-items:flex-start;padding:90px var(--pad) 80px}
+  .contact{flex-direction:column;align-items:flex-start;padding:90px var(--pad) 44px}
   .bars{display:none}
+  .form-section{padding-bottom:56px}
+  .lead-form{grid-template-columns:1fr;gap:24px}
   .site-footer{flex-direction:column;align-items:flex-start;gap:8px}
 }
 
@@ -267,3 +308,29 @@ html[data-contrast="light"] .row-body .row-extra{border-color:#D8946C}
 .doc a{border-bottom:1px solid var(--copper)}
 .doc .tbd{background:rgba(192,122,82,.18);color:var(--ink);padding:0 .3em}
 .doc .rule{display:block;width:120px;height:3px;background:var(--copper);margin-top:28px}
+
+/* ---------- באנר עוגיות – פאנל גרפיט עם קו נחושת, בלי פינות מעוגלות ---------- */
+.cookie-bar{position:fixed;z-index:58;bottom:16px;left:84px;right:88px;max-width:880px;margin-inline:auto;background:var(--panel);color:var(--ink);border-top:3px solid var(--copper);box-shadow:0 18px 48px rgba(0,0,0,.4);padding:20px 24px}
+.cookie-bar[hidden]{display:none}
+.cookie-title{font-size:1.0625rem;font-weight:600;margin:0 0 6px}
+.cookie-text{margin:0;font-size:.9375rem;line-height:1.6;font-weight:300;color:var(--muted)}
+.cookie-text a{color:var(--ink);border-bottom:1px solid var(--copper);white-space:nowrap}
+.cookie-prefs{display:grid;gap:10px;margin:16px 0 0}
+.cookie-prefs[hidden]{display:none}
+.cookie-opt{display:flex;align-items:flex-start;gap:12px;font-size:.9375rem;line-height:1.5;font-weight:300;cursor:pointer}
+.cookie-opt input{flex:0 0 auto;width:22px;height:22px;margin:1px 0 0;accent-color:var(--copper);cursor:pointer}
+.cookie-opt input:disabled{cursor:not-allowed}
+.cookie-opt b{font-weight:600}
+.cookie-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px}
+.cookie-btn{min-height:44px;padding:10px 20px;background:transparent;color:var(--ink);border:1px solid rgba(243,241,236,.5);font:inherit;font-size:.9375rem;font-weight:600;cursor:pointer}
+.cookie-btn:hover{border-color:var(--ink)}
+.cookie-btn--solid{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cookie-btn--solid:hover{background:#fff}
+.cookie-btn--link{border-color:transparent;font-weight:400;text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--copper)}
+.cookie-btn[hidden]{display:none}
+html[data-contrast="light"] .cookie-btn{border-color:rgba(31,35,38,.5)}
+html[data-contrast="light"] .cookie-btn--solid:hover{background:#000}
+@media (max-width:900px){
+  .cookie-bar{left:12px;right:12px;bottom:80px;padding:18px 18px 16px;max-height:calc(100dvh - 100px);overflow:auto}
+  .cookie-btn{flex:1 1 auto}
+}

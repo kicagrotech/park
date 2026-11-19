@@ -4,6 +4,8 @@
   'use strict';
   var doc = document, html = doc.documentElement, KEY = 'kic-a11y';
   var FS_MAX = 3;
+  // קישור להצהרת הנגישות (של אתר KIC) – מוגדר ב-config.js; ריק = בלי קישור
+  var A11Y_URL = (window.KIC_CONFIG && window.KIC_CONFIG.ACCESSIBILITY_URL) || '';
   var prefs = {};
   try { prefs = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { prefs = {}; }
 
@@ -55,7 +57,7 @@
     '<div class="a11y-group" role="group" aria-labelledby="a11y-disp-l"><p class="a11y-sub" id="a11y-disp-l">תצוגה</p><div class="a11y-grid">' +
     TOGGLES.map(function (t, i) { return '<button type="button" class="a11y-opt" aria-pressed="false" data-i="' + i + '">' + t.label + '</button>'; }).join('') +
     '</div></div>' +
-    '<div class="a11y-foot"><a href="accessibility.html">הצהרת נגישות</a>' +
+    '<div class="a11y-foot">' + (A11Y_URL ? '<a href="' + A11Y_URL + '" target="_blank" rel="noopener">הצהרת נגישות<span class="sr"> (נפתח בחלון חדש)</span></a>' : '<span></span>') +
     '<button type="button" class="a11y-reset">איפוס הגדרות</button></div>';
 
   doc.body.appendChild(btn);

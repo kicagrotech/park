@@ -8,10 +8,10 @@
 ```
 site/
   index.html            עמוד הנחיתה
-  accessibility.html    הצהרת נגישות (תבנית – יש placeholders למילוי)
-  privacy.html          מדיניות פרטיות (תבנית)
+  privacy.html          מדיניות פרטיות ועוגיות (תבנית – יש placeholders למילוי)
   css/styles.css        כל העיצוב, כולל מצבי תפריט הנגישות
   js/config.js          ← פרטי קשר, קישורים והודעות וואטסאפ. כאן מעדכנים.
+  js/consent.js         באנר עוגיות + טעינת GA4 / Meta Pixel רק אחרי הסכמה
   js/main.js            קישורים מה-config, אקורדיון, וידאו, קווי נחושת
   js/a11y.js            כפתור + תפריט נגישות (vanilla, בלי צד שלישי)
   assets/img            תמונות WebP ברוחבים שונים + תמונת OG
@@ -54,7 +54,7 @@ bash site/scripts/encode-video.sh poster   # רק ה-poster
 ## העלאה לאוויר
 
 1. מחליפים את `https://example.com/` בדומיין הסופי (חיפוש-והחלפה בכל `site/`):
-   `index.html` (canonical, og, twitter, JSON-LD), `accessibility.html`, `privacy.html`, `robots.txt`, `sitemap.xml`.
+   `index.html` (canonical, og, twitter, JSON-LD), `privacy.html`, `robots.txt`, `sitemap.xml`.
 2. מעלים **רק את תוכן `site/`**, בלי `scripts/` ובלי `README.md`. לא מעלים את `_source/`, `design-reference/`, `qa/` ו-`node_modules/`.
 3. בשרת:
    - דחיסת gzip/brotli ל-HTML/CSS/JS/SVG.
@@ -79,15 +79,26 @@ node qa/shots.mjs axe     # axe-core על כל הדפים ובמצבי הנגי�
 node qa/shots.mjs modes   # צילומי מצבי הנגישות
 node qa/contrast.mjs      # ניגודיות של טקסט על תמונות (axe לא מודד את זה)
 node qa/interact.mjs      # מקלדת, אקורדיון, dialog, וידאו, Save-Data, קישורים
+node qa/form.mjs          # טופס: ולידציה ושליחה (הבקשה מיורטת – לא נשלח מייל)
+node qa/consent.mjs       # באנר עוגיות + טעינת GA/Pixel רק אחרי הסכמה (מזהים מזויפים, בקשות חסומות)
 ```
 
 ## TODO למילוי
 
+- [ ] **הפעלת טופס יצירת הקשר:**
+  - הטופס נשלח ל-`office@kic.co.il` דרך FormSubmit (`FORM_ENDPOINT` ב-`js/config.js`).
+  - בשליחה הראשונה מהאתר החי מגיע ל-office@kic.co.il מייל אישור מ-FormSubmit, ולוחצים עליו פעם אחת. עד האישור הפניות לא מועברות.
+  - אחרי האישור אפשר להחליף בכתובת את המייל במזהה המוצפן שהם שולחים.
+
 - [ ] **קישור מרכז המבקרים:** `VISITOR_CENTER_URL` ב-`js/config.js` (וגם ברירת המחדל ב-`index.html`, `data-link="VISITOR_CENTER_URL"`).
-- [ ] **רכז/ת נגישות:** שם וטלפון ב-`accessibility.html`. גם נגישות המבנה ותאריך עדכון.
+- [ ] **הצהרת נגישות:** העמוד יישען על ההצהרה של אתר KIC. מכניסים את הקישור ל-`ACCESSIBILITY_URL` ב-`js/config.js`, והוא יופיע בתפריט הנגישות.
+- [ ] **אנליטיקס ופיקסל:**
+  - ממלאים את `GA4_ID` ואת `META_PIXEL_ID` ב-`js/config.js`.
+  - הכלים נטענים רק אחרי הסכמה בבאנר. כל עוד השדות ריקים, אין באנר ואין עוגיות.
+  - אירועים שנשלחים: `generate_lead` (שליחת טופס) / `Lead` בפיקסל, ו-`contact` (לחיצה על וואטסאפ, טלפון או מייל, כולל המיקום בעמוד) / `Contact` בפיקסל.
 - [ ] **קואורדינטות:** לאמת את 32.70°N 35.58°E (בעמוד וב-JSON-LD `geo`).
 - [ ] **דומיין סופי:** במקום `https://example.com/`.
 - [ ] **sameAs ב-JSON-LD:** כתובות הלינקדאין והפייסבוק הרשמיות.
-- [ ] **מדיניות פרטיות:** לעבור עם יועץ/ת משפטי/ת, ולהשלים אם יתווספו כלי אנליטיקה.
+- [ ] **מדיניות פרטיות:** לעבור עם יועץ/ת משפטי/ת, ולמלא את ה-placeholders (שמירת מידע ותאריך עדכון).
 - [ ] **פנורמת הבניין:** אם יש מקור של `hadshanut_erezbit041.jpg` ברזולוציה גבוהה מ-1600px, להריץ שוב `npm run images`. היום התמונה מוצגת קצת מוגדלת במסכים רחבים, בדיוק כמו בייחוס.
 - [ ] **בדיקה עם קורא מסך אמיתי** (NVDA או VoiceOver): הבדיקות האוטומטיות עברו, אבל בדיקה ידנית עדיין לא בוצעה.

@@ -20,6 +20,18 @@
   $$('[data-link]').forEach(function (a) { var u = C[a.getAttribute('data-link')]; if (u) a.href = u; });
   $$('[data-year]').forEach(function (s) { s.textContent = new Date().getFullYear(); });
 
+  /* ---------- מדידה: לחיצות על וואטסאפ / טלפון / מייל (נשלח רק אם ניתנה הסכמה – ראו consent.js) ---------- */
+  function track(name, params) { if (window.kicTrack) window.kicTrack(name, params); }
+  doc.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    var where = a.classList.contains('wa-fab') ? 'floating' : (a.closest('header') ? 'header' : a.closest('.hero') ? 'hero' : a.closest('.row') ? 'activity' : a.closest('footer') ? 'footer' : 'contact');
+    if (/wa\.me/.test(href)) track('contact', { method: 'whatsapp', location: where, activity: a.getAttribute('data-wa-activity') || undefined });
+    else if (/^tel:/.test(href)) track('contact', { method: 'phone', location: where });
+    else if (/^mailto:/.test(href)) track('contact', { method: 'email', location: where });
+  });
+
   /* ---------- אקורדיון הפעילויות ---------- */
   var rowsEl = doc.getElementById('rows');
   if (rowsEl) {
@@ -102,6 +114,95 @@
         });
       }).observe(v.parentNode);
     }
+  }
+
+  /* ---------- טופס יצירת קשר: ולידציה ושליחה ---------- */
+  var form = doc.getElementById('leadForm');
+  if (form) {
+    form.setAttribute('novalidate', ''); // עם JS – ולידציה שלנו (נגישה, בעברית); בלי JS – של הדפדפן
+    var status = doc.getElementById('form-status');
+    var submitBtn = doc.getElementById('f-submit');
+    var normPhone = function (v) {
+      var d = v.replace(/[\s\-().]/g, '');
+      if (/^\+972/.test(d)) d = '0' + d.slice(4);
+      else if (/^972/.test(d)) d = '0' + d.slice(3);
+      return d;
+    };
+    // נייד/VoIP: 05X/07X + 7 ספרות · קווי: 02/03/04/08/09 + 7 ספרות
+    var phoneOk = function (v) { return /^0(?:5\d|7\d)\d{7}$|^0[23489]\d{7}$/.test(normPhone(v)); };
+    var emailOk = function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); };
+    var rules = {
+      'f-name': function (v) { return !v ? 'נא למלא שם מלא' : v.length < 2 ? 'השם קצר מדי' : ''; },
+      'f-phone': function (v) { return !v ? 'נא למלא מספר טלפון' : !phoneOk(v) ? 'מספר הטלפון אינו תקין (לדוגמה: 052-1234567)' : ''; },
+      'f-email': function (v) { return !v ? 'נא למלא כתובת דוא״ל' : !emailOk(v) ? 'כתובת הדוא״ל אינה תקינה (לדוגמה: name@company.co.il)' : ''; },
+      'f-msg': function (v) { return v.length > 2000 ? 'ההודעה ארוכה מדי (עד 2000 תווים)' : ''; }
+    };
+    var tried = false;
+    var check = function (id) {
+      var el = doc.getElementById(id), err = doc.getElementById(id + '-err');
+      var msg = rules[id](el.value.trim());
+      if (msg) { el.setAttribute('aria-invalid', 'true'); err.textContent = msg; err.hidden = false; }
+      else { el.removeAttribute('aria-invalid'); err.textContent = ''; err.hidden = true; }
+      return !msg;
+    };
+    Object.keys(rules).forEach(function (id) {
+      var el = doc.getElementById(id);
+      // אחרי ניסיון השליחה הראשון – בדיקה חיה; לפני כן רק ביציאה משדה שכבר מולא
+      el.addEventListener('blur', function () { if (tried || el.value.trim()) check(id); });
+      el.addEventListener('input', function () { if (el.hasAttribute('aria-invalid')) check(id); });
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      tried = true;
+      var bad = Object.keys(rules).filter(function (id) { return !check(id); });
+      if (bad.length) {
+        status.className = 'form-status is-error';
+        status.textContent = bad.length === 1 ? 'יש שדה אחד שצריך לתקן.' : 'יש ' + bad.length + ' שדות שצריך לתקן.';
+        doc.getElementById(bad[0]).focus();
+        return;
+      }
+      if (form.elements._honey.value) return; // ספאם
+      var data = {};
+      Array.prototype.forEach.call(form.elements, function (el) {
+        if (el.name && el.name !== '_honey') data[el.name] = el.name === 'טלפון' ? normPhone(el.value) : el.value.trim();
+      });
+      data._replyto = data['דוא״ל']; // "השב" במייל יגיע ישר לפונה
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'שולח…';
+      status.className = 'form-status';
+      status.textContent = 'שולחים את הפנייה…';
+      // FormData (ולא JSON) – בקשה "פשוטה" בלי preflight של CORS
+      var fd = new FormData();
+      Object.keys(data).forEach(function (k) { fd.append(k, data[k]); });
+      fetch(C.FORM_ENDPOINT || form.action, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: fd
+      }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok || j.success === false || j.success === 'false') throw new Error(j.message || r.status);
+        });
+      }).then(function () {
+        form.reset();
+        tried = false;
+        track('generate_lead', { form: 'contact' });
+        status.className = 'form-status is-ok';
+        status.textContent = 'תודה! הפנייה נשלחה, ונחזור אליכם בהקדם.';
+      }).catch(function (err) {
+        var reason = String((err && err.message) || err || '');
+        // הסיבה האמיתית – לקונסול (F12), כדי שאפשר יהיה לאבחן
+        if (window.console) console.warn('[טופס] השליחה נכשלה:', reason);
+        var hint = '';
+        if (/activat/i.test(reason)) hint = ' (הטופס עדיין לא הופעל: יש לאשר את מייל ההפעלה של FormSubmit שנשלח ל-' + (C.EMAIL || '') + ')';
+        else if (/web server|file/i.test(reason) || location.protocol === 'file:') hint = ' (העמוד נפתח מקובץ מקומי – הטופס עובד רק מאתר שעלה לאוויר)';
+        status.className = 'form-status is-error';
+        status.textContent = 'השליחה לא הצליחה' + hint + '. אפשר לנסות שוב, או לפנות אלינו בוואטסאפ, בטלפון ' + (C.PHONE_DISPLAY || '') + ' או ב-' + (C.EMAIL || '') + '.';
+      }).then(function () {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'שליחה';
+      });
+    });
   }
 
   /* ---------- קווי הנחושת בגלילה ---------- */

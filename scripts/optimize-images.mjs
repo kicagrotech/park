@@ -73,30 +73,19 @@ async function logos() {
   await sharp(src('לוגואים KIC', 'לוגו _ לרקע כהה- High Quality.png')).resize({ width: 600 }).png({ compressionLevel: 9 }).toFile(path.join(LOGO, 'kic-logo-light.png'));
   await sharp(src('לוגואים KIC', 'לוגו _ שם מלא- High Quality.png')).resize({ width: 600 }).png({ compressionLevel: 9 }).toFile(path.join(LOGO, 'kic-logo.png'));
 
-  // אייקון: ריבוע גרפיט, לוגוטייפ KIC בהיר, קו נחושת – בלי פינות מעוגלות
-  const typeSvg = await readFile(src('לוגואים KIC', 'לוגו _ לוגוטייפ בלבד- בהיר.svg'), 'utf8');
-  const paths = [...typeSvg.matchAll(/<path class="cls-3" d="([^"]+)"/g)].map((m) => m[1]);
-  const icon = (pad) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" fill="${BG}"/>
-<g transform="translate(${256 - (184.13 * pad) / 2} ${236 - (86.47 * pad) / 2}) scale(${pad})" fill="#F3F1EC">${paths.map((d) => `<path d="${d}"/>`).join('')}</g>
-<rect x="${256 - (184.13 * pad) / 2}" y="${236 + (86.47 * pad) / 2 + 34}" width="${184.13 * pad * 0.62}" height="14" fill="${COPPER}"/>
-</svg>`;
-  const iconSvg = icon(2.1);
-  await writeFile(path.join(SITE, 'favicon.svg'), iconSvg);
-  const iconBuf = Buffer.from(iconSvg);
-  const maskBuf = Buffer.from(icon(1.7)); // maskable: אזור בטוח
-  await sharp(iconBuf).resize(180).png().toFile(path.join(SITE, 'apple-touch-icon.png'));
-  await sharp(iconBuf).resize(192).png().toFile(path.join(SITE, 'assets/logo/icon-192.png'));
-  await sharp(iconBuf).resize(512).png().toFile(path.join(SITE, 'assets/logo/icon-512.png'));
-  await sharp(maskBuf).resize(512).png().toFile(path.join(SITE, 'assets/logo/icon-maskable-512.png'));
-  // favicon.ico (ICO שמכיל PNG 32x32 – נתמך בכל הדפדפנים)
-  const png32 = await sharp(iconBuf).resize(32).png().toBuffer();
-  const header = Buffer.alloc(22);
-  header.writeUInt16LE(0, 0); header.writeUInt16LE(1, 2); header.writeUInt16LE(1, 4);
-  header.writeUInt8(32, 6); header.writeUInt8(32, 7); header.writeUInt8(0, 8); header.writeUInt8(0, 9);
-  header.writeUInt16LE(1, 10); header.writeUInt16LE(32, 12);
-  header.writeUInt32LE(png32.length, 14); header.writeUInt32LE(22, 18);
-  await writeFile(path.join(SITE, 'favicon.ico'), Buffer.concat([header, png32]));
+  // Favicon – זהה לאתר KIC (kinneretinnovation.com): הלוגו הוורטיקלי.
+  // favicon.svg = "לוגו _ ורטיקלי.svg" (אותו קובץ שבאתר, מנוקה מה-<image> השבור); favicon.ico = הקובץ מהאתר, כמו שהוא.
+  const favSvg = await cleanSvg(src('לוגואים KIC', 'לוגו _ ורטיקלי.svg'), path.join(SITE, 'favicon.svg'));
+  await writeFile(path.join(SITE, 'favicon.ico'), await readFile(src('לוגואים KIC', 'favicon-kinneretinnovation.ico')));
+  // אייקונים לטלפון / manifest: אותו לוגו על ריבוע לבן (אטום), עם שוליים
+  const square = async (size, logoH) => {
+    const logo = await sharp(Buffer.from(favSvg), { density: 600 }).resize({ height: Math.round(logoH) }).png().toBuffer();
+    return sharp({ create: { width: size, height: size, channels: 4, background: '#FFFFFF' } }).composite([{ input: logo, gravity: 'center' }]).png();
+  };
+  await (await square(180, 180 * 0.78)).toFile(path.join(SITE, 'apple-touch-icon.png'));
+  await (await square(192, 192 * 0.8)).toFile(path.join(SITE, 'assets/logo/icon-192.png'));
+  await (await square(512, 512 * 0.8)).toFile(path.join(SITE, 'assets/logo/icon-512.png'));
+  await (await square(512, 512 * 0.6)).toFile(path.join(SITE, 'assets/logo/icon-maskable-512.png')); // maskable: אזור בטוח
   console.log('logo + icons: done');
 }
 
