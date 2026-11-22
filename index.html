@@ -129,6 +129,43 @@ if(p.fs||p.spacing||p.font)h.setAttribute('data-flow','');}catch(e){}})();
 
   </section>
 
+  <section class="form-section" id="form" aria-labelledby="h-form">
+    <h2 id="h-form" class="h-form">השאירו פרטים, <b>ונחזור אליכם.</b></h2>
+    <!-- נשלח ל-office@kic.co.il דרך FormSubmit (הכתובת מוגדרת ב-js/config.js → FORM_ENDPOINT).
+         בלי JS הטופס נשלח רגיל (action) עם ולידציה מובנית של הדפדפן. -->
+    <form class="lead-form" id="leadForm" action="https://formsubmit.co/office@kic.co.il" method="POST" accept-charset="UTF-8">
+      <div class="field">
+        <label for="f-name">שם מלא <span class="req">(חובה)</span></label>
+        <input id="f-name" name="שם מלא" type="text" autocomplete="name" required minlength="2" maxlength="80" aria-describedby="f-name-err">
+        <p class="err" id="f-name-err" hidden></p>
+      </div>
+      <div class="field">
+        <label for="f-phone">טלפון <span class="req">(חובה)</span></label>
+        <input id="f-phone" name="טלפון" type="tel" inputmode="tel" autocomplete="tel" required maxlength="20" dir="ltr" aria-describedby="f-phone-err">
+        <p class="err" id="f-phone-err" hidden></p>
+      </div>
+      <div class="field">
+        <label for="f-email">דוא״ל <span class="req">(חובה)</span></label>
+        <input id="f-email" name="דוא״ל" type="email" autocomplete="email" required maxlength="120" dir="ltr" aria-describedby="f-email-err">
+        <p class="err" id="f-email-err" hidden></p>
+      </div>
+      <div class="field field--msg">
+        <label for="f-msg">הודעה</label>
+        <input id="f-msg" name="הודעה" type="text" maxlength="2000" aria-describedby="f-msg-err">
+        <p class="err" id="f-msg-err" hidden></p>
+      </div>
+      <!-- מלכודת ספאם: בוטים ממלאים, אנשים לא רואים -->
+      <div class="hp" aria-hidden="true"><label for="f-hp">לא למילוי</label><input id="f-hp" type="text" name="_honey" tabindex="-1" autocomplete="off"></div>
+      <input type="hidden" name="_subject" value="פנייה מעמוד הנחיתה – פארק KIC">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <div class="form-actions">
+        <button class="btn" type="submit" id="f-submit">שליחה</button>
+        <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+  </section>
+
   <section class="place" id="place" aria-labelledby="h-place">
     <div class="place-head">
       <h2 id="h-place" class="h-place"><b>פארק ההייטק של הצפון.</b></h2>
@@ -219,44 +256,6 @@ if(p.fs||p.spacing||p.font)h.setAttribute('data-flow','');}catch(e){}})();
       </div>
     </div>
     <div class="bars" aria-hidden="true"><span style="width:360px"></span><span style="width:240px"></span><span style="width:420px"></span><span style="width:300px"></span></div>
-  </section>
-
-  <section class="form-section" id="form" aria-labelledby="h-form">
-    <h2 id="h-form" class="h-form">השאירו פרטים, <b>ונחזור אליכם.</b></h2>
-    <!-- נשלח ל-office@kic.co.il דרך FormSubmit (הכתובת מוגדרת ב-js/config.js → FORM_ENDPOINT).
-         בלי JS הטופס נשלח רגיל (action) עם ולידציה מובנית של הדפדפן. -->
-    <form class="lead-form" id="leadForm" action="https://formsubmit.co/office@kic.co.il" method="POST" accept-charset="UTF-8">
-      <p class="form-note" id="form-note">שדות המסומנים ב„חובה” הם שדות חובה.</p>
-      <div class="field">
-        <label for="f-name">שם מלא <span class="req">(חובה)</span></label>
-        <input id="f-name" name="שם מלא" type="text" autocomplete="name" required minlength="2" maxlength="80" aria-describedby="f-name-err">
-        <p class="err" id="f-name-err" hidden></p>
-      </div>
-      <div class="field">
-        <label for="f-phone">טלפון <span class="req">(חובה)</span></label>
-        <input id="f-phone" name="טלפון" type="tel" inputmode="tel" autocomplete="tel" required maxlength="20" dir="ltr" aria-describedby="f-phone-err">
-        <p class="err" id="f-phone-err" hidden></p>
-      </div>
-      <div class="field">
-        <label for="f-email">דוא״ל <span class="req">(חובה)</span></label>
-        <input id="f-email" name="דוא״ל" type="email" autocomplete="email" required maxlength="120" dir="ltr" aria-describedby="f-email-err">
-        <p class="err" id="f-email-err" hidden></p>
-      </div>
-      <div class="field field--wide">
-        <label for="f-msg">הודעה</label>
-        <textarea id="f-msg" name="הודעה" rows="4" maxlength="2000" aria-describedby="f-msg-err"></textarea>
-        <p class="err" id="f-msg-err" hidden></p>
-      </div>
-      <!-- מלכודת ספאם: בוטים ממלאים, אנשים לא רואים -->
-      <div class="hp" aria-hidden="true"><label for="f-hp">לא למילוי</label><input id="f-hp" type="text" name="_honey" tabindex="-1" autocomplete="off"></div>
-      <input type="hidden" name="_subject" value="פנייה מעמוד הנחיתה – פארק KIC">
-      <input type="hidden" name="_template" value="table">
-      <input type="hidden" name="_captcha" value="false">
-      <div class="form-actions">
-        <button class="btn" type="submit" id="f-submit">שליחה</button>
-        <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
-      </div>
-    </form>
   </section>
 </main>
 

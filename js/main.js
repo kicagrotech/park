@@ -168,6 +168,9 @@
         if (el.name && el.name !== '_honey') data[el.name] = el.name === 'טלפון' ? normPhone(el.value) : el.value.trim();
       });
       data._replyto = data['דוא״ל']; // "השב" במייל יגיע ישר לפונה
+      // FormSubmit מזהה את האתר לפי כתובת העמוד. בלי Referer מלא הוא מחזיר "open this page through a web server"
+      // (קורה בדפדפנים עם הגנת פרטיות) – לכן שולחים את הכתובת גם כשדה _url וגם כ-Referer מלא.
+      data._url = location.href.split('#')[0];
       submitBtn.disabled = true;
       submitBtn.textContent = 'שולח…';
       status.className = 'form-status';
@@ -178,7 +181,9 @@
       fetch(C.FORM_ENDPOINT || form.action, {
         method: 'POST',
         headers: { Accept: 'application/json' },
-        body: fd
+        body: fd,
+        referrer: location.href.split('#')[0],
+        referrerPolicy: 'no-referrer-when-downgrade'
       }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || j.success === false || j.success === 'false') throw new Error(j.message || r.status);
@@ -195,7 +200,8 @@
         if (window.console) console.warn('[טופס] השליחה נכשלה:', reason);
         var hint = '';
         if (/activat/i.test(reason)) hint = ' (הטופס עדיין לא הופעל: יש לאשר את מייל ההפעלה של FormSubmit שנשלח ל-' + (C.EMAIL || '') + ')';
-        else if (/web server|file/i.test(reason) || location.protocol === 'file:') hint = ' (העמוד נפתח מקובץ מקומי – הטופס עובד רק מאתר שעלה לאוויר)';
+        else if (location.protocol === 'file:') hint = ' (העמוד נפתח מקובץ מקומי – הטופס עובד רק מאתר שעלה לאוויר)';
+        else if (/web server/i.test(reason)) hint = ' (שירות השליחה לא קיבל את כתובת העמוד מהדפדפן)';
         status.className = 'form-status is-error';
         status.textContent = 'השליחה לא הצליחה' + hint + '. אפשר לנסות שוב, או לפנות אלינו בוואטסאפ, בטלפון ' + (C.PHONE_DISPLAY || '') + ' או ב-' + (C.EMAIL || '') + '.';
       }).then(function () {

@@ -120,7 +120,7 @@ h2 b{font-weight:600}
 .row-extra:hover{border-color:var(--on-img)}
 
 /* contact */
-.contact{padding:100px var(--pad) 48px;display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+.contact{padding:100px var(--pad) 90px;display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
 .h-contact{font-size:clamp(2.5rem,calc(4.5vw*var(--fsx)),4rem);line-height:1.05;letter-spacing:-.02em}
 .h-contact b{font-weight:700}
 .contact-links{display:flex;flex-wrap:wrap;align-items:center;gap:28px;margin-top:40px;font-size:1.125rem}
@@ -128,20 +128,16 @@ h2 b{font-weight:600}
 .bars span{display:block;height:34px;background:var(--bar)}
 .bars span:nth-child(2){background:var(--copper)}
 
-/* טופס יצירת קשר – קווים אופקיים בלבד, בלי פינות מעוגלות */
-.form-section{padding:0 var(--pad) 64px}
-
-.h-form{font-size:clamp(1.875rem,calc(3vw*var(--fsx)),2.75rem);line-height:1.25;letter-spacing:-.01em;margin-bottom:26px;padding-top:40px;border-top:1px solid rgba(243,241,236,.18)}
+/* טופס יצירת קשר – פס קומפקטי מתחת ל-Hero, כל השדות בשורה אחת. קווים אופקיים, בלי פינות מעוגלות */
+.form-section{position:relative;margin-top:40px;padding:26px var(--pad) 30px;background:var(--panel);border-top:3px solid var(--copper)}
+.h-form{font-size:1.375rem;line-height:1.3;font-weight:300;letter-spacing:-.005em;margin:0 0 14px}
 .h-form b{font-weight:600}
-.lead-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 40px}
-.form-note{grid-column:1/-1;margin:0 0 -6px;font-size:.875rem;font-weight:300;color:var(--muted)}
-.field{display:flex;flex-direction:column;gap:8px}
-.field--wide{grid-column:1/-1}
-.field label{font-size:.9375rem;font-weight:400;color:var(--ink)}
-.field .req{font-size:.8125rem;font-weight:300;color:var(--muted)}
-.field input,.field textarea{width:100%;min-height:48px;padding:12px 2px;background:transparent;color:var(--ink);border:0;border-bottom:1px solid rgba(243,241,236,.55);border-radius:0;font:300 1.0625rem 'Noto Sans Hebrew',sans-serif;transition:border-color .3s}
+.lead-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr) minmax(0,1.6fr) auto;gap:10px 28px;align-items:start}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:.875rem;line-height:1.5;font-weight:400;color:var(--ink)}
+.field .req{font-size:.75rem;font-weight:300;color:var(--muted)}
+.field input,.field textarea{width:100%;min-height:44px;padding:9px 2px;background:transparent;color:var(--ink);border:0;border-bottom:1px solid rgba(243,241,236,.55);border-radius:0;font:300 1rem 'Noto Sans Hebrew',sans-serif;transition:border-color .3s}
 .field input[dir="ltr"]{text-align:right}
-.field textarea{resize:vertical;min-height:110px;line-height:1.6}
 .field input:hover,.field textarea:hover{border-bottom-color:var(--ink)}
 .field input:focus,.field textarea:focus{border-bottom-color:var(--copper-light)}
 .field input:focus-visible,.field textarea:focus-visible{outline:2px solid var(--copper-light);outline-offset:4px}
@@ -149,18 +145,17 @@ h2 b{font-weight:600}
 .err{margin:0;font-size:.875rem;font-weight:400;color:var(--err)}
 .err::before{content:"! ";font-weight:700}
 .hp{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap} /* לא left:-9999px – ב-RTL זה יוצר גלילה אופקית */
-.form-section{position:relative}
-.form-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:24px}
-.form-actions .btn{border:0;cursor:pointer;font-family:inherit}
+.form-actions{display:contents}
+.form-actions .btn{margin-top:27px;min-height:44px;padding:11px 30px;border:0;cursor:pointer;font-family:inherit;white-space:nowrap}
 .form-actions .btn:disabled{opacity:.6;cursor:wait}
-.form-status{margin:0;font-size:1rem;font-weight:400}
+.form-status{grid-column:1/-1;margin:0;font-size:.9375rem;font-weight:400}
+.form-status:empty{margin-top:-10px} /* נשאר בעץ הנגישות כדי שההודעה תוקרא כשתופיע */
 .form-status.is-ok{color:var(--ok)}
 .form-status.is-error{color:var(--err)}
 :root{--err:#FFB4A0;--ok:#B6E3B8}
 html[data-contrast="high"]{--err:#FFC4B4;--ok:#C8F0CA}
 html[data-contrast="light"]{--err:#A3321A;--ok:#2E6B32}
 html[data-contrast="light"] .field input,html[data-contrast="light"] .field textarea{border-bottom-color:rgba(31,35,38,.6)}
-html[data-contrast="light"] .h-form{border-top-color:rgba(31,35,38,.2)}
 
 /* footer – [prod] פרטים מלאים במקום "טיוטת עיצוב" */
 .site-footer{padding:28px var(--pad);background:var(--footer);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 32px;font-size:.8125rem;color:var(--dim)}
@@ -170,6 +165,11 @@ html[data-contrast="light"] .h-form{border-top-color:rgba(31,35,38,.2)}
 .site-footer a:hover{color:var(--ink)}
 .site-footer p a{border-bottom:1px solid var(--copper);padding-bottom:1px} /* [a11y] קישור בתוך טקסט – לא רק בצבע (1.4.1) */
 .site-footer .copy{flex-basis:100%}
+
+@media (max-width:1180px) and (min-width:901px){
+  .lead-form{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .field--msg{grid-column:1/3}
+}
 
 /* mobile */
 @media (max-width: 900px){
@@ -197,10 +197,11 @@ html[data-contrast="light"] .h-form{border-top-color:rgba(31,35,38,.2)}
   .row-body{right:22px;width:calc(100% - 44px)}
   .row-more{padding-right:0}
   .row-more p{font-size:1rem}
-  .contact{flex-direction:column;align-items:flex-start;padding:90px var(--pad) 44px}
+  .contact{flex-direction:column;align-items:flex-start;padding:90px var(--pad) 80px}
   .bars{display:none}
-  .form-section{padding-bottom:56px}
-  .lead-form{grid-template-columns:1fr;gap:24px}
+  .form-section{margin-top:0;padding:22px var(--pad) 26px}
+  .lead-form{grid-template-columns:1fr;gap:14px}
+  .form-actions .btn{margin-top:4px;justify-self:start}
   .site-footer{flex-direction:column;align-items:flex-start;gap:8px}
 }
 
